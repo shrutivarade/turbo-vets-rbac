@@ -42,3 +42,22 @@ Thumbs.db
 .nx/workspace-data
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+# Database files
+*.sqlite
+*.db
+rbac.sqlite
+
+# Build outputs
+dist/
+api/dist/
+
+# Environment files (if they contain secrets)
+# .env
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
