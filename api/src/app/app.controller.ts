@@ -63,40 +63,6 @@ export class AppController {
     };
   }
 
-  /**
-   * Tasks List Endpoint (Demo)
-   * 
-   * @route GET /tasks
-   * @description Demonstrates organization-scoped data access and RBAC principles
-   * @access All authenticated users (Owner, Admin, Viewer)
-   * @security JWT Bearer Token required
-   * @rbac All roles can read tasks within their organization
-   * @returns {Object} Organization-scoped task query simulation
-   * 
-   * @example
-   * GET /tasks
-   * Headers: { "Authorization": "Bearer <jwt_token>" }
-   * Response: { "message": "Tasks endpoint - organization scoped", "query": "SELECT * FROM task WHERE organizationId = 1", ... }
-   */
-  @Get('tasks')
-  async getTasks(@Request() req: any) {
-    // Simulate what a real task query would look like with organization scoping
-    const userOrgId = req.user?.organizationId;
-    
-    return {
-      message: 'Tasks endpoint - organization scoped',
-      user: {
-        id: req.user?.id,
-        email: req.user?.email,
-        role: req.user?.role,
-        organizationId: req.user?.organizationId
-      },
-      query: `SELECT * FROM task WHERE organizationId = ${userOrgId}`,
-      note: `This user can ONLY see tasks from organization ${userOrgId}`,
-      security: 'Cross-organization access is BLOCKED by design',
-      timestamp: new Date().toISOString()
-    };
-  }
 
   /**
    * RBAC Policy Test Endpoint

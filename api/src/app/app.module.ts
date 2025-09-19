@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SeedService } from '../seed/seed.service';
 import { AuditModule } from '../audit/audit.module';
 import { AuditInterceptor } from '../audit/audit.interceptor';
+import { TasksModule } from '../tasks/tasks.module';
 
 
 @Module({
@@ -32,6 +33,7 @@ import { AuditInterceptor } from '../audit/audit.interceptor';
     TypeOrmModule.forFeature([User, Organization, Task, AuditLog]),
     AuthModule,
     AuditModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [

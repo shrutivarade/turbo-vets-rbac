@@ -1,6 +1,13 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RbacUser } from '@rbac-workspace/auth';
+
+// Define RbacUser interface locally
+interface RbacUser {
+  id: number;
+  email: string;
+  role: string;
+  organizationId: number;
+}
 
 /**
  * Policy predicate function type

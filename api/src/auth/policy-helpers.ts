@@ -88,6 +88,34 @@ function canViewAuditLogs(user: RbacUser): boolean {
 }
 
 /**
+ * Get the scope for tasks based on user role and organization
+ * @param user The authenticated user
+ * @returns Object with where clause for task queries
+ */
+function scopeForTasks(user: RbacUser): { organizationId: number; createdByUserId?: number } {
+  const scope: { organizationId: number; createdByUserId?: number } = {
+    organizationId: user.organizationId
+  };
+  
+  // Viewers can only see their own tasks
+  if (user.role === 'viewer') {
+    scope.createdByUserId = user.id;
+  }
+  
+  return scope;
+}
+
+/**
+ * Check if user is the creator of a task
+ * @param user The authenticated user
+ * @param task The task to check
+ * @returns Boolean indicating if user created the task
+ */
+function isTaskCreator(user: RbacUser, task: RbacTask): boolean {
+  return user.id === task.createdByUserId;
+}
+
+/**
  * Role-based Policy Helpers
  * 
  * Pre-configured policy functions for common role-based access patterns.
@@ -365,3 +393,14 @@ export class ResourceExtractors {
     return userId ? parseInt(userId) : null;
   }
 }
+
+// Export the RBAC functions
+export {
+  canReadTasks,
+  canCreateTask,
+  canUpdateTask,
+  canDeleteTask,
+  scopeForTasks,
+  isSameOrganization,
+  isTaskCreator
+};
