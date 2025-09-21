@@ -1,1 +1,187 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles and CSS custom properties */
+
+:root {
+  /* Color Palette */
+  --background-white: #ffffff;
+  --background-light: #f8f9fa;
+  --background-dark: #343a40;
+  
+  /* Text Colors */
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --text-light: #ffffff;
+  
+  /* Border Colors */
+  --border-light: #dee2e6;
+  --border-medium: #ced4da;
+  --border-dark: #adb5bd;
+  
+  /* Brand Colors */
+  --lavender-blush: #ffeef0;
+  --vanilla: #fff8dc;
+  --icterine: #fcf55f;
+  --melon: #ffb3ba;
+  --tea-rose-red: #f08080;
+  
+  /* Status Colors */
+  --success: #28a745;
+  --info: #17a2b8;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  
+  /* Shadows */
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-heavy: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Border Radius */
+  --border-radius: 6px;
+  --border-radius-lg: 8px;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+
+  --lavender-blush: #f7edf0;
+  --lemon-blush: #f7f7ed;
+  --grass-blush: #e8f5e9;
+  --melon: #f4afab;
+  --tea-rose-red: #f4cbc6;
+  --icterine: #F8F8B4;
+  --green: #BBE8B5;
+  --text-primary: #2c2c2c;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9b9b9b;
+  --border-light: #e8e8e8;
+  --border-medium: #d1d1d1;
+  --background-white: #ffffff;
+  --background-light: #fafafa;
+  --shadow-light: 0 1px 3px rgba(21, 5, 5, 0.1);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.15);
+  
+}
+
+/* Global reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Yrsa", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--background-light);
+}
+
+/* Base button reset */
+button {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Base input reset */
+input, 
+textarea, 
+select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Base focus styles */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+/* Utility classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.d-none {
+  display: none;
+}
+
+.d-block {
+  display: block;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.mb-1 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-2 {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-3 {
+  margin-bottom: var(--spacing-lg);
+}
+
+.mt-0 {
+  margin-top: 0;
+}
+
+.mt-1 {
+  margin-top: var(--spacing-sm);
+}
+
+.mt-2 {
+  margin-top: var(--spacing-md);
+}
+
+.mt-3 {
+  margin-top: var(--spacing-lg);
+}

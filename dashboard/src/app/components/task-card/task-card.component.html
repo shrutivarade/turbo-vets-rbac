@@ -1,0 +1,48 @@
+<div class="task-card" [class]="getStatusClass()" (click)="onTaskClick()">
+  <div class="task-header">
+    <h3 class="task-title">{{ task.title }}</h3>
+    <div class="task-actions" *ngIf="canEdit()">
+      <button class="action-btn edit-btn" (click)="onEdit($event)" title="Edit Task">
+        Edit
+      </button>
+      <button class="action-btn delete-btn" (click)="onDelete($event)" title="Delete Task" *ngIf="canDelete()">
+        Delete
+      </button>
+    </div>
+  </div>
+  
+  <p class="task-description">{{ task.description | slice:0:100 }}{{ task.description.length > 100 ? '...' : '' }}</p>
+  
+  <div class="task-meta">
+    <div class="task-tags">
+      <span class="task-tag category" [class]="getCategoryClass()">
+        {{ getCategoryLabel() }}
+      </span>
+      
+    </div>
+    
+    <div class="task-status">
+      <span class="status-badge" [class]="getStatusClass()">
+        {{ getStatusLabel() }}
+      </span>
+    </div>
+  </div>
+  
+  <div class="task-footer">
+    <div class="task-dates">
+      <span class="due-date" *ngIf="task.dueDate" [class.overdue]="isOverdue()">
+        Due: {{ task.dueDate | date:'short' }}
+      </span>
+      <span class="created-date">
+        Created {{ task.createdAt | date:'short' }}
+      </span>
+    </div>
+    
+    <div class="task-progress" *ngIf="task.progress !== undefined">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="task.progress"></div>
+      </div>
+      <span class="progress-text">{{ task.progress }}%</span>
+    </div>
+  </div>
+</div>

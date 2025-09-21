@@ -1,0 +1,23 @@
+{
+  "name": "@rbac-workspace/auth",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@ngrx/store": "^18.0.0",
+    "@ngrx/effects": "^18.0.0",
+    "@auth0/angular-jwt": "^5.0.2",
+    "rxjs": "~7.8.0"
+  },
+  "peerDependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/router": "^20.3.0",
+    "@ngrx/store": "^18.0.0",
+    "@ngrx/effects": "^18.0.0"
+  }
+}

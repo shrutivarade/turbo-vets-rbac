@@ -1,0 +1,79 @@
+<div class="task-form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode ? 'Edit Task' : 'Create New Task' }}</h2>
+    <button (click)="onCancel()" class="close-btn">×</button>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" #taskForm="ngForm" class="task-form">
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        [(ngModel)]="formData.title" 
+        required 
+        class="form-input"
+        placeholder="Enter task title"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description *</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        [(ngModel)]="formData.description" 
+        required 
+        rows="4" 
+        class="form-textarea"
+        placeholder="Enter task description"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category *</label>
+      <select 
+        id="category" 
+        name="category" 
+        [(ngModel)]="formData.category" 
+        required 
+        class="form-select"
+      >
+        <option value="">Select category</option>
+        <option *ngFor="let category of categoryOptions" [value]="category">
+          {{ getCategoryLabel(category) }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group" *ngIf="isEditMode">
+      <label for="status">Status</label>
+      <select 
+        id="status" 
+        name="status" 
+        [(ngModel)]="formData.status" 
+        class="form-select"
+      >
+        <option *ngFor="let status of statusOptions" [value]="status">
+          {{ getStatusLabel(status) }}
+        </option>
+      </select>
+    </div>
+
+
+    <div class="form-actions">
+      <button type="button" (click)="onCancel()" class="btn btn-secondary">
+        Cancel
+      </button>
+      <button 
+        type="submit" 
+        [disabled]="!taskForm.form.valid || isSubmitting" 
+        class="btn btn-primary"
+      >
+        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update Task' : 'Create Task' }}</span>
+        <span *ngIf="isSubmitting">Saving...</span>
+      </button>
+    </div>
+  </form>
+</div>

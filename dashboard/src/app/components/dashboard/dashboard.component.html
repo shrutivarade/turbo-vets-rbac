@@ -1,0 +1,84 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">Task Management Dashboard</h1>
+      <div class="user-info">
+        <span class="welcome-text">Welcome, {{ currentUser?.email }}!</span>
+        <div class="user-actions">
+          <!-- <span class="user-role" [ngClass]="'role-' + currentUser?.role">{{ currentUser?.role?.toUpperCase() }}</span> -->
+          <button (click)="logout()" class="logout-btn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Task Statistics -->
+  <section class="stats-section" *ngIf="stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.total }}</div>
+          <div class="stat-label">Total Tasks</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.byStatus?.todo || 0 }}</div>
+          <div class="stat-label">To Do</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.byStatus?.doing || 0 }}</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ stats.byStatus?.done || 0 }}</div>
+          <div class="stat-label">Done</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Task Management -->
+  <section class="tasks-section">
+    <div class="tasks-header">
+      <h2 class="tasks-title">My Tasks</h2>
+      <div class="tasks-actions">
+        <button 
+          (click)="showCreateForm()" 
+          class="create-btn"
+          *ngIf="canCreateTasks()">
+          + Create Task
+        </button>
+      </div>
+    </div>
+
+    <!-- Task List Component -->
+    <app-task-list 
+      (createTask)="showCreateForm()"
+      (editTask)="showEditForm($event)"
+      (deleteTask)="onDeleteTask($event)">
+    </app-task-list>
+  </section>
+
+  <!-- Task Form Modal -->
+  <div class="modal-overlay" *ngIf="showTaskForm" (click)="hideTaskForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ isEditMode ? 'Edit Task' : 'Create New Task' }}</h3>
+        <button (click)="hideTaskForm()" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <app-task-form 
+          [task]="selectedTask"
+          [isEditMode]="isEditMode"
+          (save)="onSaveTask($event)"
+          (cancel)="hideTaskForm()">
+        </app-task-form>
+      </div>
+    </div>
+  </div>
+</div>

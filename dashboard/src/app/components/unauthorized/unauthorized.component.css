@@ -1,0 +1,110 @@
+/* Unauthorized Component Styles - Notion-inspired Design */
+:root {
+  --lavender-blush: #f7edf0;
+  --tea-rose-red: #f4cbc6;
+  --melon: #f4afab;
+  --vanilla: #f4eea9;
+  --icterine: #f4f482;
+  --text-primary: #2c2c2c;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9b9b9b;
+  --border-light: #e8e8e8;
+  --border-medium: #d1d1d1;
+  --background-white: #ffffff;
+  --background-light: #fafafa;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-heavy: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.unauthorized-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background: linear-gradient(135deg, var(--lavender-blush) 0%, var(--vanilla) 100%); */
+  padding: 1rem;
+}
+
+.unauthorized-content {
+  text-align: center;
+  background: var(--background-white);
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-heavy);
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid var(--border-light);
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  color: var(--tea-rose-red);
+  font-weight: bold;
+}
+
+h1 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.home-btn {
+  background: var(--vanilla);
+  color: var(--text-primary);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-top: 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.home-btn:hover {
+  background: var(--icterine);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .unauthorized-content {
+    padding: 2rem;
+    margin: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  .error-icon {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .unauthorized-content {
+    padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 1.25rem;
+  }
+  
+  p {
+    font-size: 0.9rem;
+  }
+}

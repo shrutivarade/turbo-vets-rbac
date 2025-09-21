@@ -1,0 +1,184 @@
+<div class="task-list-container">
+  <!-- Search and Filters -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        (input)="onSearchChange()"
+        placeholder="Search tasks..."
+        class="search-input">
+    </div>
+    
+    <div class="filter-controls">
+      <!-- dropdown label -->
+      <label for="status">Status:</label>
+      <select [(ngModel)]="filters.status" (change)="loadTasks()" class="filter-select">
+        <option value="" selected>All Status</option>
+        <option value="todo">To Do</option>
+        <option value="doing">Doing</option>
+        <option value="done">Done</option>
+      </select>
+      
+      <!-- dropdown label -->
+      <label for="category">Category:</label>
+      <select [(ngModel)]="filters.category" (change)="loadTasks()" class="filter-select">
+        <option value="">All Categories</option>
+        <option value="work">Work</option>
+        <option value="personal">Personal</option>
+      </select>
+      
+      <!-- clear filters button -->
+      <button (click)="clearFilters()" class="clear-filters-btn">Clear Filters</button>
+    </div>
+  </div>
+
+  <!-- Quick Filter Buttons -->
+  <!-- <div class="quick-filters">
+    <button 
+      (click)="setQuickFilter('all')" 
+      [class.active]="quickFilter === 'all'"
+      class="quick-filter-btn">
+      All Tasks
+    </button>
+    <button 
+      (click)="setQuickFilter('todo')" 
+      [class.active]="quickFilter === 'todo'"
+      class="quick-filter-btn">
+      To Do
+    </button>
+    <button 
+      (click)="setQuickFilter('doing')" 
+      [class.active]="quickFilter === 'doing'"
+      class="quick-filter-btn">
+      Doing
+    </button>
+    <button 
+      (click)="setQuickFilter('done')" 
+      [class.active]="quickFilter === 'done'"
+      class="quick-filter-btn">
+      Done
+    </button>
+  </div> -->
+
+  <!-- Task Display -->
+  <div class="tasks-display">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Loading tasks...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && filteredTasks.length === 0" class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>No tasks found</h3>
+      <p *ngIf="hasActiveFilters">Try adjusting your filters or search terms.</p>
+      <p *ngIf="!hasActiveFilters">Create your first task to get started!</p>
+      <button 
+        (click)="onCreateTask()" 
+        class="create-first-task-btn"
+        *ngIf="!hasActiveFilters">
+        + Create Task
+      </button>
+    </div>
+
+    <!-- Task List View -->
+    <!-- <div *ngIf="!isLoading && filteredTasks.length > 0" class="task-list">
+      <div 
+        *ngFor="let task of filteredTasks; trackBy: trackByTaskId" 
+        class="task-item"
+        (click)="onTaskClick(task)">
+        <div class="task-content">
+          <div class="task-header">
+            <h4 class="task-title">{{ task.title }}</h4>
+            <div class="task-meta">
+              <span class="task-status" [ngClass]="'status-' + task.status">
+                {{ task.status | titlecase }}
+              </span>
+              <span class="task-category" [ngClass]="'category-' + task.category">
+                {{ task.category | titlecase }}
+              </span>
+            </div>
+          </div>
+          
+          <p class="task-description" *ngIf="task.description">
+            {{ task.description }}
+          </p>
+          
+          <div class="task-footer">
+            <div class="task-dates">
+              <span class="task-created-date">
+                Created: {{ task.createdAt | date:'MMM d' }}
+              </span>
+              <span class="task-updated-date" *ngIf="task.updatedAt !== task.createdAt">
+                Updated: {{ task.updatedAt | date:'MMM d' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="task-actions" *ngIf="authService.canCreateTasks()">
+          <button 
+            (click)="onEditTask(task); $event.stopPropagation()" 
+            class="action-btn edit-btn"
+            title="Edit task">
+            Edit
+          </button>
+          <button 
+            (click)="onDeleteTask(task); $event.stopPropagation()" 
+            class="action-btn delete-btn"
+            title="Delete task"
+            *ngIf="authService.canDeleteTasks()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- Task Grid View -->
+    <div *ngIf="!isLoading && filteredTasks.length > 0" class="task-grid">
+      <div 
+        *ngFor="let task of filteredTasks; trackBy: trackByTaskId" 
+        class="task-card"
+        (click)="onTaskClick(task)">
+        <div class="card-header">
+          <h4 class="card-title">{{ task.title }}</h4>
+          <span class="card-status" [ngClass]="'status-' + task.status">
+            {{ task.status | titlecase }}
+          </span>
+        </div>
+        
+        <p class="card-description" *ngIf="task.description">
+          {{ task.description }}
+        </p>
+        <span class="category-tag" [ngClass]="'category-' + task.category">
+          {{ task.category | titlecase }}
+        </span>
+        <div class="card-footer">
+          <div class="card-dates">
+            <span class="card-created-date">
+              {{ task.createdAt | date:'MMM d' }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="card-actions" *ngIf="authService.canCreateTasks()">
+          <button 
+            (click)="onEditTask(task); $event.stopPropagation()" 
+            class="card-action-btn edit-btn"
+            title="Edit task">
+            Edit
+          </button>
+          <button 
+            (click)="onDeleteTask(task); $event.stopPropagation()" 
+            class="card-action-btn delete-btn"
+            title="Delete task"
+            *ngIf="authService.canDeleteTasks()">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

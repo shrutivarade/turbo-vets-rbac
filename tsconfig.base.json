@@ -16,6 +16,12 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@rbac-workspace/source"]
+    "customConditions": ["@rbac-workspace/source"],
+    "baseUrl": ".",
+    "paths": {
+      "@rbac-workspace/auth": ["libs/auth/src/index.ts"],
+      "@rbac-workspace/data": ["data/src/index.ts"],
+      "@rbac-workspace/shared-ui": ["libs/shared-ui/src/index.ts"]
+    }
   }
 }
