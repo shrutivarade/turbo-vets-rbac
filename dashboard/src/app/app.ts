@@ -1,5 +1,5 @@
-import { Component, signal, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal, OnInit, NgZone } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { FormsModule } from '@angular/forms';
@@ -29,14 +29,26 @@ export class App implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private router: Router,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
     // Subscribe to current user changes
     this.authService.getCurrentUserObservable().subscribe((user: User | null) => {
+      console.log('Auth state changed:', { user, wasAuthenticated: this.isAuthenticated });
       this.currentUser = user;
+      const wasAuthenticated = this.isAuthenticated;
       this.isAuthenticated = !!user;
+      
+      // If user just became authenticated and we're not on a protected route, navigate to dashboard
+      if (user && !wasAuthenticated && this.router.url === '/') {
+        this.ngZone.run(() => {
+          console.log('User authenticated, navigating to dashboard...');
+          this.router.navigate(['/dashboard']);
+        });
+      }
     });
 
     // Subscribe to loading state
@@ -59,6 +71,24 @@ export class App implements OnInit {
         this.loadingService.hide();
         // Clear form after successful login
         this.loginCredentials = { email: '', password: '' };
+        
+        // Force navigation to dashboard after successful login
+        // Using NgZone to ensure Angular change detection runs properly
+        this.ngZone.run(() => {
+          console.log('Login successful, navigating to dashboard...');
+          this.router.navigate(['/dashboard']).then(success => {
+            console.log('Navigation result:', success);
+            if (!success) {
+              console.warn('Navigation to dashboard failed, trying alternative route');
+              // Fallback navigation
+              window.location.href = '/dashboard';
+            }
+          }).catch(error => {
+            console.error('Navigation error:', error);
+            // Fallback to manual page reload to avoid stuck state
+            window.location.reload();
+          });
+        });
       },
       error: (error: any) => {
         console.error('Login failed:', error);

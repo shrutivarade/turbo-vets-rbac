@@ -96,6 +96,7 @@ data/dist/
 
 # Environment files
 .env
+api/.env
 .env.local
 .env.development
 .env.test
