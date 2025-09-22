@@ -27,7 +27,7 @@ A role-based, auditable task management system built with NestJS (API) and Angul
   4. Optional: run without Nx (manual build then run):
      - cd api && npx webpack-cli build --node-env=development & node dist/main.js
   5. Test API
-     - `npm test`
+     - `cd api` & `npm test`
 
 - Frontend (Angular Dashboard)
   1. `cd dashboard`
