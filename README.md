@@ -1,109 +1,225 @@
-# RbacWorkspace
+### TurboVets Secure Task Management System (Modular NX monorepo)
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A role-based, auditable task management system built with NestJS (API) and Angular (Dashboard) in an Nx-powered monorepo. It implements JWT auth, RBAC policy guards, organization scoping, and comprehensive audit logging.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+### Setup instructions
 
-## Generate a library
+- Prerequisites
+  - Node.js 20+
+  - npm 9+
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+- Backend (API)
+  1. From the monorepo root (`rbac-workspace/`), install dependencies:
+     - `npm install`
+  2. Create a `.env` file in `rbac-workspace/` or `rbac-workspace/api/` (both are supported by `ConfigModule`):
+     ```env
+     JWT_SECRET=dev_secret_change_me
+     DB_PATH=rbac.sqlite
+     PORT=3000
+     # Set to true for first run to seed sample orgs/users/tasks
+     SEED=true
+     ```
+  3. Start the API (Nx):
+     - `npx nx serve api`
+     - The server runs at `http://localhost:3000/api`
+  4. Optional: run without Nx (manual build then run):
+     - cd api && npx webpack-cli build --node-env=development & node dist/main.js
+  5. Test API
+     - `npm test`
+
+- Frontend (Angular Dashboard)
+  1. `cd dashboard`
+  2. `npm install`
+  3. `npm start` (Angular dev server at `http://localhost:4200`)
+  4. Dashboard expects API at `http://localhost:3000/api` (see `src/environments/environment.ts`)
+
+- First-run seeding
+  - Seeding is triggered automatically on startup when `SEED=true` (see `AppService.onModuleInit`).
+  - After the first run, set `SEED=false` to avoid reseeding on subsequent starts.
+
+- Test accounts (seeded)
+  - TurboVets AI Solutions
+    - Owner: `ceo@turbovets.ai` / `owner123`
+    - Admin: `cto@turbovets.ai` / `admin123`
+    - Viewer: `developer@turbovets.ai` / `viewer123`
+  - Additional organizations and users are seeded (VA Medical Center, VBA Regional Office, VetConnect). See server logs for full list.
+
+---
+
+### Architecture overview (Monorepo layout)
+
+- Monorepo: Nx + npm workspaces
+- High-level structure
+  - `rbac-workspace/api` — NestJS REST API (TypeORM + SQLite, JWT auth, RBAC, audit)
+  - `rbac-workspace/dashboard` — Angular 20+ dashboard (NgRx, Material)
+  - `rbac-workspace/data` — Shared TypeScript DTOs and enums (e.g., `LoginDto`, `TaskDto`, `TaskStatus`)
+  - `rbac-workspace/auth` — Shared auth types (e.g., `RbacUser`)
+  - `rbac-workspace/api-e2e` — API E2E tests (Jest setup)
+
+- Why Nx
+  - Consistent tooling across backend and frontend with task graph and cached builds
+  - Local libraries for DTOs/types reduce duplication and runtime drift
+  - Scalable project structure for adding services/apps while sharing code
+
+- Shared libraries/modules
+  - `@rbac-workspace/data`: DTOs and enums used by API and Dashboard
+    ```ts
+    import { TaskStatus, TaskCategory } from '@rbac-workspace/data';
+    import type { CreateTaskDto } from '@rbac-workspace/data';
+    ```
+  - `@rbac-workspace/auth`: shared `RbacUser` type for audit and guards
+    ```ts
+    import type { RbacUser } from '@rbac-workspace/auth';
+    ```
+
+- API bootstrap and globals
+  - Global prefix: `api` (`main.ts`)
+  - CORS enabled for `http://localhost:4200`
+  - Global guards/interceptors:
+    - `JwtAuthGuard` as `APP_GUARD` — enforces JWT on all routes except public auth/health
+    - `AuditInterceptor` as `APP_INTERCEPTOR` — logs every request/response and errors
+
+- Data layer
+  - SQLite via TypeORM (auto sync dev): `User`, `Organization`, `Task`, `AuditLog`
+  - Config via `.env` (supports root `.env` or `api/.env`)
+
+---
+
+### Data model explanation
+
+- Entities (simplified)
+  - `User`: `id`, `email`, `passwordHash`, `role` (owner|admin|viewer), `organizationId`, `firstName`, `lastName`, `title`
+  - `Organization`: `id`, `name`, `description`
+  - `Task`: `id`, `title`, `description?`, `status` (todo|doing|done), `category` (work|personal), `createdByUserId`, `organizationId`, timestamps
+  - `AuditLog`: action/result, user/organization context, resource type/id, http info, details, duration, timestamp
+
+- ERD
+```
+Organization (id, name)
+   1 ────────* User (id, email, role, organizationId)
+   1 ────────* Task (id, title, status, category, organizationId, createdByUserId)
+
+User (id)
+   1 ────────* Task (createdByUserId)
+
+AuditLog (id, action, result, userId?, organizationId?, resourceType?, resourceId?, ...)
 ```
 
-## Run tasks
+---
 
-To build the library use:
+### Access control implementation
 
-```sh
-npx nx build pkg1
-```
+- Roles and organization hierarchy
+  - Roles: `owner` > `admin` > `viewer`
+  - All access is organization-scoped: users can only act within their `organizationId`
 
-To run any task with Nx use:
+- Permissions (from `policy-helpers.ts`)
+  - Read tasks: all authenticated roles within their org
+  - Create tasks: `owner` and `admin`
+  - Update tasks: `owner` and `admin`; `viewer` only if creator
+  - Delete tasks: `owner` only
 
-```sh
-npx nx <target> <project-name>
-```
+- JWT integration
+  - `AuthController` issues JWT via `AuthService.login()` with payload `{ sub, email, role, orgId }`
+  - `JwtStrategy` validates token and loads the `User` attached as `req.user`
+  - `JwtAuthGuard` allows public routes under `/auth/*` and protects everything else
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+- Declarative policies
+  - `@Policy()` with `PolicyGuard` evaluates predicates using `req.user` and optional resource extractors
+  - Convenience decorators: `@AdminOnly()`, `@OwnerOnly()`, `@RequireRole([...])`
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+---
 
-## Versioning and releasing
+### API docs
 
-To version and release the library use
+- Base URL: `http://localhost:3000/api`
 
-```
-npx nx release
-```
+- Auth
+  - `POST /auth/login` — login, returns `{ access_token, user }`
+  - `GET /auth/test` — public health for auth routes
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+- Health and demos
+  - `GET /` — API health (public)
+  - `GET /protected` — requires JWT
+  - `GET /admin-only` — admin/owner
+  - `GET /owner-only` — owner
+  - `GET /rbac-test` — returns current user context
+  - `GET /task-read-demo`, `GET /task-create-demo`, `GET /audit-log-demo` — policy demos
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+- Tasks
+  - `GET /tasks` — list with filters `status`, `category`, `createdByUserId`
+  - `GET /tasks/stats` — aggregate stats (org-scoped)
+  - `GET /tasks/my-tasks` — tasks created by current user
+  - `GET /tasks/:id` — get by id
+  - `POST /tasks` — create (admin/owner)
+  - `PATCH /tasks/:id` — update (admin/owner; viewer if creator)
+  - `DELETE /tasks/:id` — delete (owner)
 
-## Keep TypeScript project references up to date
+- Audit
+  - `GET /audit/logs` — list with filters/action/result/limits
+  - `GET /audit/summary` — summary metrics
+  - `GET /audit/stats` — detailed stats
+  - `GET /audit/recent` — recent activity
+  - `GET /audit/health` — audit health
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+- Samples
+  - Login
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/login \
+      -H 'Content-Type: application/json' \
+      -d '{"email":"ceo@turbovets.ai","password":"owner123"}'
+    ```
+  - List tasks
+    ```bash
+    curl -H "Authorization: Bearer <jwt>" \
+      'http://localhost:3000/api/tasks?status=todo&category=work'
+    ```
+  - Task stats
+    ```bash
+    curl -H "Authorization: Bearer <jwt>" http://localhost:3000/api/tasks/stats
+    ```
+  - Audit logs
+    ```bash
+    curl -H 'Authorization: Bearer <jwt>' \
+      'http://localhost:3000/api/audit/logs?action=task_created&result=success&limit=10'
+    ```
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+---
 
-```sh
-npx nx sync
-```
+### Notes on potential future enhancements
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+- Advanced role delegation
+  - Org-scoped custom roles and per-resource delegation (task-level maintainers)
+  - Temporal roles (time-bound access) and just-in-time elevation with audit
 
-```sh
-npx nx sync:check
-```
+- Production-ready security
+  - JWT refresh tokens with rotation and revocation lists (per device)
+  - `helmet`, rate limiting, strict CORS, IP allow/deny lists
+  - CSRF protection (if using cookies); sameSite/secure flags; session hardening
+  - Secrets via vault/KMS; field-level encryption for sensitive data
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+- RBAC performance & caching
+  - Cache policy results (short TTL) and commonly used scopes (Redis)
+  - Preload resources for policy evaluation (DataLoader/unit-of-work)
+  - Compile policies to decision graphs for O(1) checks (e.g., CASL/Oso-like)
 
-## Set up CI!
+- Data & scalability
+  - PostgreSQL + migrations; read replicas; partitioned audit table with retention
+  - Async, batched audit ingestion; backpressure and reliability policies
 
-### Step 1
+- Observability & DX
+  - Structured logs, request IDs, metrics, traces (OpenTelemetry)
+  - Swagger/OpenAPI + typed clients for Angular; CI/CD with Nx cache and affected builds
 
-To connect to Nx Cloud, run the following command:
+---
 
-```sh
-npx nx connect
-```
+### Quick reference
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
+- API base: `http://localhost:3000/api`
+- Dashboard: `http://localhost:4200`
+- Env: `.env` at repo root or `api/.env`
+- DB: SQLite file at `DB_PATH` (default `rbac.sqlite`)
 
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+If anything is unclear or you want Swagger/OpenAPI added, say the word and I’ll wire it up.

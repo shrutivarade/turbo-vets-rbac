@@ -14,17 +14,31 @@
       "build": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "webpack-cli build",
-          "args": [
-            "--node-env=production"
-          ],
+          "command": "npx webpack-cli build --node-env=production && mkdir -p ../dist/api && cp dist/main.js ../dist/api/",
           "cwd": "api"
         },
         "configurations": {
           "development": {
-            "args": [
-              "--node-env=development"
-            ]
+            "command": "npx webpack-cli build --node-env=development && mkdir -p ../dist/api && cp dist/main.js ../dist/api/"
+          }
+        }
+      },
+      "serve": {
+        "executor": "nx:run-commands",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "command": "node ../dist/api/main.js",
+          "cwd": "api"
+        },
+        "configurations": {
+          "development": {
+            "command": "node ../dist/api/main.js"
+          },
+          "production": {
+            "command": "node ../dist/api/main.js"
           }
         }
       },
@@ -75,26 +89,6 @@
           "copy-workspace-modules"
         ],
         "executor": "nx:noop"
-      },
-      "serve": {
-        "continuous": true,
-        "executor": "@nx/js:node",
-        "defaultConfiguration": "development",
-        "dependsOn": [
-          "build"
-        ],
-        "options": {
-          "buildTarget": "@rbac-workspace/api:build",
-          "runBuildTargetDependencies": false
-        },
-        "configurations": {
-          "development": {
-            "buildTarget": "@rbac-workspace/api:build:development"
-          },
-          "production": {
-            "buildTarget": "@rbac-workspace/api:build:production"
-          }
-        }
       }
     }
   },
@@ -116,8 +110,10 @@
   },
   "devDependencies": {
     "@nestjs/testing": "^10.0.0",
+    "@nx/node": "^21.5.3",
     "@types/jest": "^29.5.0",
     "@types/node": "^20.0.0",
+    "esbuild": "^0.25.10",
     "jest": "^29.5.0",
     "jest-watch-typeahead": "^2.2.0",
     "ts-jest": "^29.1.0",
