@@ -73,27 +73,61 @@
           </button>
         </div>
         
-        <div class="demo-credentials">
-          <p class="demo-text">Demo Credentials:</p>
-          
-          <div class="credentials-grid">
-            <div class="org-column">
-              <h4 class="org-title">TechCorp Industries</h4>
-              <p class="demo-email">admin@techcorp.com / admin123</p>
-              <p class="demo-email">owner@techcorp.com / owner123</p>
-              <p class="demo-email">viewer@techcorp.com / viewer123</p>
-            </div>
-            
-            <div class="org-column">
-              <h4 class="org-title">StartupXYZ</h4>
-              <p class="demo-email">owner@startup.com / owner123</p>
-              <p class="demo-email">admin@startup.com / admin123</p>
-              <p class="demo-email">viewer@startup.com / viewer123</p>
-            </div>
-          </div>
+        <div class="demo-section">
+          <button type="button" class="demo-btn" (click)="showCredentialsPopup()">
+            📋 View Demo Credentials
+          </button>
         </div>
       </form>
     </main>
+  </div>
+</div>
+
+<!-- Credentials Popup Modal -->
+<div class="modal-overlay" *ngIf="showCredentialsModal" (click)="closeCredentialsPopup()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Veteran Healthcare AI Demo Credentials</h3>
+      <button class="close-btn" (click)="closeCredentialsPopup()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- <div class="super-admin-section">
+        <h4 class="super-admin-title">🚀 Super Admin Access</h4>
+        <p class="demo-email super-credential">ceo@turbovets.ai / owner123</p>
+        <p class="super-description">Full system access across all organizations</p>
+      </div> -->
+      
+      <div class="credentials-grid">
+        <div class="org-column">
+          <h4 class="org-title">VA Medical Center</h4>
+          <p class="demo-email">chief.medical@va-sf.gov / owner123</p>
+          <p class="demo-email">ai.specialist@va-sf.gov / admin123</p>
+          <p class="demo-email">nurse.coordinator@va-sf.gov / viewer123</p>
+        </div>
+        
+        <div class="org-column">
+          <h4 class="org-title">TurboVets AI</h4>
+          <p class="demo-email">ceo@turbovets.ai / owner123</p>
+          <p class="demo-email">cto@turbovets.ai / admin123</p>
+          <p class="demo-email">developer@turbovets.ai / viewer123</p>
+        </div>
+        
+        <div class="org-column">
+          <h4 class="org-title">VBA Regional Office</h4>
+          <p class="demo-email">regional.director@vba.gov / owner123</p>
+          <p class="demo-email">claims.supervisor@vba.gov / admin123</p>
+          <p class="demo-email">benefits.specialist@vba.gov / viewer123</p>
+        </div>
+        
+        <div class="org-column">
+          <h4 class="org-title">VetConnect Digital</h4>
+          <p class="demo-email">director@vetconnect.org / owner123</p>
+          <p class="demo-email">platform.manager@vetconnect.org / admin123</p>
+          <p class="demo-email">support.specialist@vetconnect.org / viewer123</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

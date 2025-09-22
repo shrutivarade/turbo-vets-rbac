@@ -19,6 +19,7 @@ export class App implements OnInit {
   isAuthenticated = false;
   isLoading = false;
   errorMessage: string | null = null;
+  showCredentialsModal = false;
   
   // Login form credentials
   loginCredentials: LoginRequest = {
@@ -74,5 +75,13 @@ export class App implements OnInit {
 
   clearError(): void {
     this.errorMessage = null;
+  }
+
+  showCredentialsPopup(): void {
+    this.showCredentialsModal = true;
+  }
+
+  closeCredentialsPopup(): void {
+    this.showCredentialsModal = false;
   }
 }

@@ -21,6 +21,15 @@ export class User {
   @Column({ type: 'simple-enum', enum: Role })
   role!: Role;
   
+  @Column({ nullable: true })
+  firstName?: string;
+  
+  @Column({ nullable: true })
+  lastName?: string;
+  
+  @Column({ nullable: true })
+  title?: string;
+  
   @ManyToOne('Organization', 'users')
   organization?: any;
   
