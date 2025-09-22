@@ -3,7 +3,7 @@ import { AuditService } from './audit.service';
 import { PolicyGuard } from '../auth/policy.guard';
 import { Policy } from '../auth/policy.decorators';
 import { AuditPolicies } from '../auth/policy-helpers';
-import { AuditLogQueryDto, AuditLogSummaryDto, AuditLogStatsDto } from '../interfaces/audit-log.dto';
+import type { AuditLogQueryDto, AuditLogSummaryDto, AuditLogStatsDto } from '../interfaces/audit-log.dto';
 import { RbacUser } from '@rbac-workspace/auth';
 
 /**
@@ -262,7 +262,7 @@ export class AuditController {
     } catch (error) {
       return {
         status: 'unhealthy',
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       };
     }
@@ -272,8 +272,8 @@ export class AuditController {
    * Determine if audit logs should be scoped to user's organization
    */
   private shouldScopeToOrganization(user: RbacUser): boolean {
-    // Only scope to organization if user is not a system admin
-    // In a real system, you might have a global admin role
-    return user.role !== 'system_admin'; // Assuming system_admin can see all orgs
+    // Only scope to organization if user is not an owner
+    // Owners can see all organizations, admins and viewers are scoped to their org
+    return user.role !== 'owner';
   }
 }
